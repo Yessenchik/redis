@@ -2,7 +2,7 @@
 ## How to run
 1. Clone repository
 ```bash
-git clone <your-repo>
+git clone https://github.com/Yessenchik/redis.git
 cd app2-grpc
 ```
 
