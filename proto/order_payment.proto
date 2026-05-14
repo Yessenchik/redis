@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package orderpayment;
+
+option go_package = "github.com/Yessenchik/generated/orderpayment;orderpayment";
+
+import "google/protobuf/timestamp.proto";
+
+service PaymentService {
+  rpc ProcessPayment(PaymentRequest) returns (PaymentResponse);
+  rpc ListPayments(ListPaymentsRequest) returns (ListPaymentsResponse);
+}
+
+service OrderService {
+  rpc SubscribeToOrderUpdates(OrderRequest) returns (stream OrderStatusUpdate);
+}
+
+message PaymentRequest {
+  string order_id = 1;
+  double amount = 2;
+  string customer_email = 3;
+}
+
+message PaymentResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message ListPaymentsRequest {
+  string status = 1;
+}
+
+message PaymentItem {
+  string id = 1;
+  string order_id = 2;
+  double amount = 3;
+  string status = 4;
+  google.protobuf.Timestamp created_at = 5;
+  
+}
+
+message ListPaymentsResponse {
+  repeated PaymentItem payments = 1;
+}
+
+message OrderRequest {
+  string order_id = 1;
+}
+
+message OrderStatusUpdate {
+  string order_id = 1;
+  string status = 2;
+  google.protobuf.Timestamp updated_at = 3;
+}

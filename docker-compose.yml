@@ -1,0 +1,67 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: ap2_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ap2_db
+    ports:
+      - "5442:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: ap2_redis
+    ports:
+      - "6379:6379"
+
+  order-service:
+    build:
+      context: .
+      dockerfile: ./order-service/Dockerfile
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - .env
+    ports:
+      - "8088:8080"
+      - "50052:50052"
+
+  payment-service:
+    build:
+      context: .
+      dockerfile: ./payment-service/Dockerfile
+    depends_on:
+      - postgres
+      - rabbitmq
+    env_file:
+      - .env
+    ports:
+      - "50051:50051"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: ap2_rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: ./notification-service/Dockerfile
+    depends_on:
+      - rabbitmq
+      - redis
+    env_file:
+      - .env
+    restart: always
+
+volumes:
+  postgres_data:
